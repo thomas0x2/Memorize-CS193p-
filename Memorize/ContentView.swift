@@ -8,57 +8,61 @@
 import SwiftUI
 
 struct ContentView: View {
-    let emojis: [String] = ["♠️", "♦️", "♣️", "♥️", "♠️", "♦️", "♣️", "♥️", "♠️", "♦️", "♣️", "♥️", "♠️", "♦️", "♣️", "♥️"]
-    @State var card_count = 4
+    @State var emojis: [String] = ["♠️", "♦️", "♣️", "♥️", "♠️", "♦️", "♣️", "♥️", "♟️", "🎲", "🕯️", "🍷", "🃏", "♟️", "🎲", "🕯️", "🍷", "🃏"]
     var body: some View {
         
         VStack(spacing: 20){
+            Text("Memorize!").font(.largeTitle)
             ScrollView{
                 cards
             }
             Spacer()
-            cardCounterAdjusters
+            cardAdjusters
         }
         .padding()
     }
     
     var cards: some View{
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: 120))]) {
-            ForEach(0..<card_count, id: \.self) { index in
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 60))]) {
+            ForEach(emojis.indices, id: \.self) { index in
                 CardView(content: emojis[index])
                     .aspectRatio(2/3, contentMode: .fit)
             }
         }
     }
-    var cardCounterAdjusters: some View{
+    var cardAdjusters: some View{
         HStack{
-            cardRemover
-            Spacer()
-            cardAdder
+            halloweenThemer
+            classicThemer
+            flagsThemer
         }
         .imageScale(.large)
-        .font(.largeTitle)
     }
     
-    func cardCounterAdjuster(by offset: Int, symbol: String) -> some View {
+    func themeChooser(emojis: [String], name: String, symbol: String) -> some View {
         Button(action:{
-            card_count += offset
+            self.emojis = emojis.shuffled()
         }, label:{
-            Image(systemName: symbol)
+            VStack{
+                Image(systemName: symbol).font(.largeTitle)
+                Text(name)
+            }
         })
-        .disabled(card_count + offset < 1 || card_count + offset > emojis.count)
     }
-    var cardRemover: some View{
-        return cardCounterAdjuster(by: -1, symbol: "minus.circle")
+    var classicThemer: some View{
+        return themeChooser(emojis: ["♠️", "♦️", "♣️", "♥️", "♠️", "♦️", "♣️", "♥️", "♟️", "🎲", "🕯️", "🍷", "🃏", "♟️", "🎲", "🕯️", "🍷", "🃏"], name: "Classic", symbol: "heart")
     }
-    var cardAdder: some View{
-        return cardCounterAdjuster(by: +1, symbol: "plus.app")
+    var halloweenThemer: some View{
+        return themeChooser(emojis: ["🩸", "🪞", "🕷️", "🧟‍♂️", "💀", "👻", "🎃", "👹","🩸", "🪞", "🕷️", "🧟‍♂️", "💀", "👻", "🎃", "👹",], name:"Halloween", symbol: "cat")
+    }
+    var flagsThemer: some View{
+        return themeChooser(emojis: ["🏴‍☠️", "🇩🇪", "🇪🇺", "🇫🇷", "🇮🇳", "🇰🇵", "🇺🇸", "🇬🇧", "🇧🇷", "🇨🇳", "🇷🇺", "🏴‍☠️", "🇩🇪", "🇪🇺", "🇫🇷", "🇮🇳", "🇰🇵", "🇺🇸", "🇬🇧", "🇧🇷", "🇨🇳", "🇷🇺"], name:"Flags", symbol: "flag")
     }
 }
 
 struct CardView: View {
     let content: String
-    @State var isFaceUp = true
+    @State var isFaceUp = false
     
     var body: some View {
         ZStack {
@@ -69,7 +73,7 @@ struct CardView: View {
                 Text(content).font(.largeTitle)
             }
             .opacity(isFaceUp ? 1 : 0)
-            base.fill(.black).opacity(isFaceUp ? 0 : 1)
+            base.fill(.red).opacity(isFaceUp ? 0 : 1)
         }
         .onTapGesture {
             isFaceUp.toggle()
